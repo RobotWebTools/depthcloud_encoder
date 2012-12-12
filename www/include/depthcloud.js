@@ -45,7 +45,7 @@ function (THREE) {
 
         var vertex_shader, fragment_shader
         var shaderVXhr = new XMLHttpRequest();
-        shaderVXhr.open("GET", "depthcloud_vs.shader", true);
+        shaderVXhr.open("GET", "include/shaders/depthcloud_vs.shader", true);
 
         shaderVXhr.onload = function () {
             that.vertex_shader = shaderVXhr.responseText;
@@ -54,7 +54,7 @@ function (THREE) {
         shaderVXhr.send(null);
 
         var shaderFXhr = new XMLHttpRequest();
-        shaderFXhr.open("GET", "depthcloud_fs.shader", true);
+        shaderFXhr.open("GET", "include/shaders/depthcloud_fs.shader", true);
         shaderFXhr.onload = function () {
             that.fragment_shader = shaderFXhr.responseText;
             that.initStreamer();

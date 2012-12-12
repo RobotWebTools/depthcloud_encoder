@@ -62,7 +62,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     self.send_error(404, 'Not enough information supplied: %s' % self.path)
             # Get files from the local file system
             else:
-                filePath = ".."+self.path
+                filePath = "."+self.path
                 print 'Getting', filePath
                 try:
                     f = open(filePath) 
