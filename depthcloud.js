@@ -20,6 +20,7 @@ function (THREE) {
         // ///////////////////////////
 
         this.url = options.url;
+        this.shaderUrl = options.shaderUrl || 'js/';
         this.sceneNode = options.sceneNode;
         // f defaults to standard Kinect calibration
         this.f = (options.f !== undefined) ? options.f : 526;
@@ -45,7 +46,7 @@ function (THREE) {
 
         var vertex_shader, fragment_shader
         var shaderVXhr = new XMLHttpRequest();
-        shaderVXhr.open("GET", "depthcloud_vs.shader", true);
+        shaderVXhr.open("GET", this.shaderUrl+"depthcloud_vs.shader", true);
 
         shaderVXhr.onload = function () {
             that.vertex_shader = shaderVXhr.responseText;
@@ -54,7 +55,7 @@ function (THREE) {
         shaderVXhr.send(null);
 
         var shaderFXhr = new XMLHttpRequest();
-        shaderFXhr.open("GET", "depthcloud_fs.shader", true);
+        shaderFXhr.open("GET", this.shaderUrl+"depthcloud_fs.shader", true);
         shaderFXhr.onload = function () {
             that.fragment_shader = shaderFXhr.responseText;
             that.initStreamer();
