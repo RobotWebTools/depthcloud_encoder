@@ -22,11 +22,24 @@
     this.renderer = renderer;
     this.projector = new THREE.Projector();
     this.lastTarget = fallbackTarget;
-    this.dragging = null;
+    this.dragging = false;
     this.fallbackTarget = fallbackTarget;
   
     // listen to DOM events
-    var eventNames = ["contextmenu", "click", "dblclick", "mouseout", "mousedown", "mouseup", "mousemove", "mousewheel"];
+    var eventNames = [
+    "contextmenu", 
+    "click", 
+    "dblclick", 
+    "mouseout", 
+    "mousedown", 
+    "mouseup", 
+    "mousemove", 
+    "mousewheel",
+    "touchstart",
+    "touchend",
+    "touchcancel",
+    "touchleave",
+    "touchmove"];
     this.listeners = {};
   
     eventNames.forEach(function(eventName) {
@@ -42,15 +55,18 @@
   }
   
   MouseHandler.prototype.processDomEvent = function(domEvent) {
-  
+
     domEvent.preventDefault();
   
     var intersections = [];
   
     // compute normalized device coords and 3d mouse ray
     var target = domEvent.target;
-    var deviceX = (domEvent.clientX - target.offsetLeft) / target.clientWidth * 2 - 1;
-    var deviceY = -(domEvent.clientY - target.offsetTop) / target.clientHeight * 2 + 1;
+    var rect = target.getBoundingClientRect();
+    var left = domEvent.clientX - rect.left - target.clientLeft + target.scrollLeft;
+    var top = domEvent.clientY - rect.top - target.clientTop + target.scrollTop;
+    var deviceX = left / target.clientWidth * 2 - 1;
+    var deviceY = -top / target.clientHeight * 2 + 1;
     
     var vector = new THREE.Vector3(deviceX, deviceY, 0.5);
     this.projector.unprojectVector(vector, this.camera);
@@ -67,21 +83,27 @@
       intersection : this.lastIntersection
     };
   
+    // if the mouse leaves the dom element, stop everything
+    if (domEvent.type == "mouseout") {
+      if ( this.dragging ) {      
+        this.notify(this.lastTarget, "mouseup", event3d);
+        this.dragging = false;
+      }
+      this.notify(this.lastTarget, "mouseout", event3d);
+      this.lastTarget=null;
+      return;
+    }
+  
     // While the user is holding the mouse down,
     // stay on the same target
     if (this.dragging) {
       this.notify(this.lastTarget, domEvent.type, event3d);
-      if (domEvent.type === "mouseup") {
+      // for the right button, the order of events is mousedown-contextmenu-mouseup
+      // otherwise, it is mousedown-mouseup-click
+      if ((domEvent.type === "mouseup" && domEvent.button === 2) ||
+           domEvent.type === "click" ) {
         this.dragging = false;
       }
-      return;
-    }
-  
-    // if the mouse leaves the dom element, stop everything
-    if (domEvent.type == "mouseout") {
-      this.dragging = false;
-      this.notify(this.lastTarget, "mouseout", event3d);
-      this.lastTarget=null;
       return;
     }
   

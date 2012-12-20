@@ -12,6 +12,7 @@
   var Client = ImProxy.Client = function(ros) {
     this.ros = ros;
     this.interactiveMarkers = {};
+    this.clientId = "improxy.js " + Math.round( Math.random() * 1000000 );
   };
   Client.prototype.__proto__ = EventEmitter2.prototype;
 
@@ -100,6 +101,8 @@
     this.header   = imMsg.header;
     this.controls = imMsg.controls;
     this.menuEntries = imMsg.menu_entries;
+    this.dragging = false;
+    this.timeoutHandle = null;
   };
   
   IntMarkerHandle.prototype.__proto__ = EventEmitter2.prototype;
@@ -117,35 +120,56 @@
     this.emit('server_updated_pose', poseMsg);
   };
 
-  IntMarkerHandle.prototype.setPoseFromClient = function(pose) {
-    this.pose.position.x = pose.position.x;
-    this.pose.position.y = pose.position.y;
-    this.pose.position.z = pose.position.z;
-    this.pose.orientation.x = pose.orientation.x;
-    this.pose.orientation.y = pose.orientation.y;
-    this.pose.orientation.z = pose.orientation.z;
-    this.pose.orientation.w = pose.orientation.w;
-    this.emit('client_updated_pose', pose);
-    this.sendFeedback(POSE_UPDATE);
+  IntMarkerHandle.prototype.setPoseFromClient = function(event) {
+    function clonePose( pose ) {
+      var clone = {
+        position: {},
+        orientation: {}
+      };
+      clone.position.x = pose.position.x;
+      clone.position.y = pose.position.y;
+      clone.position.z = pose.position.z;
+      clone.orientation.x = pose.orientation.x;
+      clone.orientation.y = pose.orientation.y;
+      clone.orientation.z = pose.orientation.z;
+      clone.orientation.w = pose.orientation.w;
+      return clone;
+    }
+    this.pose = clonePose(event);
+    this.emit('client_updated_pose', event);
+    this.sendFeedback(POSE_UPDATE, undefined, 0, event.controlName);
+
+    // keep sending pose feedback until the mouse goes up
+    if ( this.dragging ) {
+      if ( this.timeoutHandle ) {
+        clearTimeout(this.timeoutHandle);
+      }
+      this.timeoutHandle = setTimeout( this.setPoseFromClient.bind(this,event), 250 );
+    } 
   };
 
   IntMarkerHandle.prototype.onButtonClick = function(event) {
-    this.sendFeedback(BUTTON_CLICK, event.clickPosition);
+    this.sendFeedback(BUTTON_CLICK, event.clickPosition, 0, event.controlName);
   };
 
   IntMarkerHandle.prototype.onMouseDown = function(event) {
-    this.sendFeedback(MOUSE_DOWN, event.clickPosition);
+    this.sendFeedback(MOUSE_DOWN, event.clickPosition, 0, event.controlName);
+    this.dragging = true;
   }
 
   IntMarkerHandle.prototype.onMouseUp = function(event) {
-    this.sendFeedback(MOUSE_UP, event.clickPosition);
+    this.sendFeedback(MOUSE_UP, event.clickPosition, 0, event.controlName);
+    this.dragging = false;
+    if ( this.timeoutHandle ) {
+      clearTimeout(this.timeoutHandle);
+    }
   }
 
   IntMarkerHandle.prototype.onMenuSelect = function(event) {
-    this.sendFeedback(MENU_SELECT, undefined, event.id);
+    this.sendFeedback(MENU_SELECT, undefined, event.id, event.controlName);
   }
 
-  IntMarkerHandle.prototype.sendFeedback = function(eventType, clickPosition, menu_entry_id) {
+  IntMarkerHandle.prototype.sendFeedback = function(eventType, clickPosition, menu_entry_id, controlName) {
     
     var mouse_point_valid = clickPosition !== undefined;
     var clickPosition = clickPosition || {
@@ -156,16 +180,15 @@
 
     var feedback = {
       header       : this.header,
-      client_id    : '',
+      client_id    : this.client_id,
       marker_name  : this.name,
-      control_name : '',
+      control_name : controlName,
       event_type   : eventType,
       pose         : this.pose,
       mouse_point  : clickPosition,
       mouse_point_valid: mouse_point_valid,
       menu_entry_id: menu_entry_id
     }
-
     this.feedbackTopic.publish(feedback);
   };
 

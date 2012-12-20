@@ -30,8 +30,8 @@
       event3d : {}
     };
   
-    handle.controls.forEach(function(control) {
-      that.add(new ImThree.InteractiveMarkerControl(that, control, camera, meshBaseUrl));
+    handle.controls.forEach(function(controlMsg) {
+      that.add(new ImThree.InteractiveMarkerControl(that, controlMsg, camera, meshBaseUrl));
     });
     
     if ( handle.menuEntries.length > 0 ) {
@@ -129,16 +129,16 @@
     return intersectPoint;
   };
   
-  InteractiveMarker.prototype.showMenu=function(event)
+  InteractiveMarker.prototype.showMenu=function(control,event)
   {
     if ( this.menu ) {
-      this.menu.show(event);
+      this.menu.show(control,event);
     }
-  }
+  };
   
-  InteractiveMarker.prototype.moveAxis = function(currentControlOri, origAxis, event3d) {
+  InteractiveMarker.prototype.moveAxis = function(control, origAxis, event3d) {
     if (this.dragging) {
-      //console.log(currentControlOri);
+      var currentControlOri = control.currentControlOri;
       var axis = currentControlOri.multiplyVector3(origAxis.clone());
       // get move axis in world coords
       var originWorld = this.dragStart.event3d.intersection.point;
@@ -152,14 +152,15 @@
       // offset from drag start position
       var p = new THREE.Vector3;
       p.add(this.dragStart.position, this.dragStart.orientation.multiplyVector3(axis.clone()).multiplyScalar(t));
-      this.setPosition(p);
+      this.setPosition(control, p);
       
       event3d.stopPropagation();
     }
   };
   
-  InteractiveMarker.prototype.movePlane = function(currentControlOri, origNormal, event3d) {
+  InteractiveMarker.prototype.movePlane = function(control, origNormal, event3d) {
     if (this.dragging) {
+      var currentControlOri = control.currentControlOri;
       var normal = currentControlOri.multiplyVector3(origNormal.clone());
       // get plane params in world coords
       var originWorld = this.dragStart.event3d.intersection.point;
@@ -172,7 +173,7 @@
       var p = new THREE.Vector3;
       p.sub(intersection, originWorld);
       p.addSelf(this.dragStart.positionWorld);
-      this.setPosition(p);
+      this.setPosition(control,p);
       event3d.stopPropagation();
     }
   };
@@ -234,14 +235,23 @@
       
       // rotate
   //    this.setOrientation( rot.multiplySelf(this.dragStart.orientationWorld) );
-      this.setOrientation( rot.multiplySelf(this.dragStart.orientationWorld) );
+      this.setOrientation( control, rot.multiplySelf(this.dragStart.orientationWorld) );
       
       // offset from drag start position
       event3d.stopPropagation();
     }
   };
   
-  InteractiveMarker.prototype.startDrag = function(event3d) {
+  InteractiveMarker.prototype.feedbackEvent = function( type, control ) {
+    this.dispatchEvent({
+      type : type,
+      position : this.position.clone(),
+      orientation : this.quaternion.clone(),
+      controlName: control.name
+    });
+  }
+  
+  InteractiveMarker.prototype.startDrag = function(control, event3d) {
     if (event3d.domEvent.button !== 0) {
       return;
     }
@@ -254,14 +264,10 @@
     this.dragStart.orientation = this.quaternion.clone();
     this.dragStart.event3d = event3d;
   
-    this.dispatchEvent({
-      type : "user_mouse_down",
-      position : this.position,
-      orientation : this.quaternion
-    });
+    this.feedbackEvent("user_mouse_down",control);
   }
   
-  InteractiveMarker.prototype.stopDrag = function(event3d) {
+  InteractiveMarker.prototype.stopDrag = function(control, event3d) {
     if (event3d.domEvent.button !== 0) {
       return;
     }
@@ -271,40 +277,23 @@
     this.onServerSetPose(this.bufferedPoseEvent);
     this.bufferedPoseEvent = undefined;
   
-    this.dispatchEvent({
-      type : "user_mouse_up",
-      position : this.position,
-      orientation : this.quaternion
-    });
+    this.feedbackEvent("user_mouse_up",control);
   }
   
-  InteractiveMarker.prototype.buttonClick = function(event3d) {
+  InteractiveMarker.prototype.buttonClick = function(control, event3d) {
     event3d.stopPropagation();
-  
-    this.dispatchEvent({
-      type : "user_button_click",
-      position : this.position,
-      orientation : this.quaternion
-    });
+    this.feedbackEvent("user_button_click",control);
   }
   
-  InteractiveMarker.prototype.setPosition = function(position) {
+  InteractiveMarker.prototype.setPosition = function(control, position) {
     this.position = position;
-    this.dispatchEvent({
-      type : "user_changed_pose",
-      position : this.position,
-      orientation : this.quaternion
-    });
+    this.feedbackEvent("user_changed_pose",control);
   }
   
-  InteractiveMarker.prototype.setOrientation = function(orientation) {
+  InteractiveMarker.prototype.setOrientation = function(control, orientation) {
     orientation.normalize();
     this.quaternion = orientation;
-    this.dispatchEvent({
-      type : "user_changed_pose",
-      position : this.position,
-      orientation : this.quaternion
-    });
+    this.feedbackEvent("user_changed_pose",control);
   }
   
   InteractiveMarker.prototype.onServerSetPose = function(event) {
@@ -331,7 +320,7 @@
 
   // --------------------------------------------------------
   
-  var InteractiveMarkerControl = ImThree.InteractiveMarkerControl = function(parent, control, camera, meshBaseUrl) {
+  var InteractiveMarkerControl = ImThree.InteractiveMarkerControl = function(parent, controlMsg, camera, meshBaseUrl) {
     THREE.Object3D.call(this);
     THREE.EventTarget.call(this);
   
@@ -339,6 +328,8 @@
     this.dragging = false;
   
     var that = this;
+    
+    this.name = controlMsg.name;
   
     var NONE = 0;
     var MENU = 1;
@@ -348,7 +339,7 @@
     var ROTATE_AXIS = 5;
     var MOVE_ROTATE = 6;
   
-    var controlOri = new THREE.Quaternion(control.orientation.x, control.orientation.y, control.orientation.z, control.orientation.w);
+    var controlOri = new THREE.Quaternion(controlMsg.orientation.x, controlMsg.orientation.y, controlMsg.orientation.z, controlMsg.orientation.w);
     controlOri.normalize();
   
     // transform x axis into local frame
@@ -358,18 +349,18 @@
     this.currentControlOri = new THREE.Quaternion();
   
     // determine mouse interaction
-    switch(control.interaction_mode) {
+    switch(controlMsg.interaction_mode) {
       case MOVE_AXIS:
-        this.addEventListener("mousemove", parent.moveAxis.bind(parent, this.currentControlOri, controlAxis));
+        this.addEventListener("mousemove", parent.moveAxis.bind(parent, this, controlAxis));
         break;
       case ROTATE_AXIS:
         this.addEventListener("mousemove", parent.rotateAxis.bind(parent, this, controlOri));
         break;
       case MOVE_PLANE:
-        this.addEventListener("mousemove", parent.movePlane.bind(parent, this.currentControlOri, controlAxis));
+        this.addEventListener("mousemove", parent.movePlane.bind(parent, this, controlAxis));
         break;
       case BUTTON:
-        this.addEventListener("click", parent.buttonClick.bind(parent));
+        this.addEventListener("click", parent.buttonClick.bind(parent, this));
         break;
       default:
         break;
@@ -380,10 +371,10 @@
       event.stopPropagation();
     }
   
-    if (control.interaction_mode != NONE) {
-      this.addEventListener('mousedown', parent.startDrag.bind(parent));
-      this.addEventListener('mouseup', parent.stopDrag.bind(parent));
-      this.addEventListener('contextmenu', parent.showMenu.bind(parent));
+    if (controlMsg.interaction_mode != NONE) {
+      this.addEventListener('mousedown', parent.startDrag.bind(parent, this));
+      this.addEventListener('mouseup', parent.stopDrag.bind(parent, this));
+      this.addEventListener('contextmenu', parent.showMenu.bind(parent, this));
       this.addEventListener('mouseover', stopPropagation);
       this.addEventListener('mouseout', stopPropagation);
       this.addEventListener('click', stopPropagation);
@@ -397,7 +388,7 @@
     var rotInv = new THREE.Quaternion();
     var posInv = parent.position.clone().multiplyScalar(-1);
   
-    switch(control.orientation_mode) {
+    switch(controlMsg.orientation_mode) {
       case INHERIT:
         rotInv = parent.quaternion.clone().inverse();
         that.updateMatrixWorld = function(force) {
@@ -413,11 +404,11 @@
           that.updateMatrix();
           that.matrixWorldNeedsUpdate = true;
           ImThree.InteractiveMarkerControl.prototype.updateMatrixWorld.call(that, force);
-          //that.currentControlOri.copy(that.quaternion);
+          that.currentControlOri.copy(that.quaternion);
         }
         break;
       case VIEW_FACING:
-        var independent_marker_orientation = control.independent_marker_orientation;
+        var independent_marker_orientation = controlMsg.independent_marker_orientation;
         that.updateMatrixWorld = function(force) {
 
           camera.updateMatrixWorld();
@@ -451,7 +442,7 @@
     }
   
     // create visuals (markers)
-    control.markers.forEach(function(markerMsg) {
+    controlMsg.markers.forEach(function(markerMsg) {
       var markerHelper = new MarkersThree.MarkerHelper(markerMsg, meshBaseUrl);
   
       if ( markerMsg.header.frame_id !== "" )
@@ -488,16 +479,13 @@
     });
 
     this.overlayDomElem = document.createElement("div");
-    this.overlayDomElem.style.visibility = "hidden";
     this.overlayDomElem.className = "interactive_marker_overlay";
 
     this.hideListener = this.hide.bind(this);
     this.overlayDomElem.addEventListener("contextmenu", this.hideListener);
     this.overlayDomElem.addEventListener("click", this.hideListener);
 
-    document.body.appendChild(this.overlayDomElem);
-    document.body.appendChild(this.menuDomElem);
-    
+
     // parse all entries
     for (var i=0; i<menuEntries.length; i++) {
       var entry = menuEntries[i];
@@ -508,7 +496,7 @@
         children: []
       };
     }
-    
+
     // link children to parents
     for (var i=0; i<menuEntries.length; i++) {
       var entry = menuEntries[i];
@@ -517,13 +505,14 @@
       var parent = allMenus[ entry.parent_id ];
       parent.children.push( menu );
     }
-    
+
     function emitMenuSelect( menuEntry, domEvent )
     {
       this.dispatchEvent({
         type: "menu_select",
         domEvent: domEvent,
-        id: menuEntry.id
+        id: menuEntry.id,
+        controlName: this.controlName
         });
       this.hide( domEvent );        
     }
@@ -558,18 +547,27 @@
     makeUl( this.menuDomElem, allMenus[0] );
   }
   
-  Menu.prototype.show = function(event) {
-    this.overlayDomElem.style.visibility = "visible";
-    this.menuDomElem.style.visibility = "visible";
+  Menu.prototype.show = function(control, event) {
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
     
+    this.controlName = control.name;
+
+    //this.overlayDomElem.style.visibility = "visible";
     this.menuDomElem.style.left = event.domEvent.clientX + 'px';
     this.menuDomElem.style.top = event.domEvent.clientY  + 'px';
+    document.body.appendChild(this.overlayDomElem);
+    document.body.appendChild(this.menuDomElem);
   }
 
   Menu.prototype.hide = function(event) {
-    event.preventDefault();
-    this.overlayDomElem.style.visibility = "hidden";
-    this.menuDomElem.style.visibility = "hidden";
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
+
+    document.body.removeChild(this.overlayDomElem);
+    document.body.removeChild(this.menuDomElem);
   }
 
   // --------------------------------------------------------

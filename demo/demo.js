@@ -71,7 +71,7 @@ InteractiveMarkerDisplay=new (function(THREE) {
     highlighter = new ThreeInteraction.Highlighter(mouseHandler);
 
     // connect to rosbridge
-    var ros = new ROS('ws://localhost:9090');
+    var ros = new ROS('ws://localhost:9099');
     
     var meshBaseUrl = 'http://localhost:8000/resources/';
 
@@ -83,13 +83,43 @@ InteractiveMarkerDisplay=new (function(THREE) {
     scene.add(depthNode);
 
     cloudStream = new DepthCloud.Viewer({
-      url : '/streams/depth_color_combined.webm?',
+      url : 'streams/depth_color_combined.webm?',
       shaderUrl: '../',
       sceneNode : depthNode,
       f : 505.0
     });
     
     cloudStream.startStream();
+    
+    var tfClient = new TfClient( {
+      ros: ros,
+      fixedFrame: 'base_link',
+      angularThres: 2.0,
+      transThres: 0.01
+    } );
+    
+    tfClient.subscribe('head_mount_kinect_rgb_optical_frame',function(transform){
+      //console.log(transform);
+
+      depthNode.position.x = transform.translation.x;
+      depthNode.position.y = transform.translation.y;
+      depthNode.position.z = transform.translation.z;
+      depthNode.useQuaternion = true;
+      depthNode.quaternion.x = transform.rotation.x;
+      depthNode.quaternion.y = transform.rotation.y;
+      depthNode.quaternion.z = transform.rotation.z;
+      depthNode.quaternion.w = transform.rotation.w;
+
+      axes.position.x = transform.translation.x;
+      axes.position.y = transform.translation.y;
+      axes.position.z = transform.translation.z;
+      axes.useQuaternion = true;
+      axes.quaternion.x = transform.rotation.x;
+      axes.quaternion.y = transform.rotation.y;
+      axes.quaternion.z = transform.rotation.z;
+      axes.quaternion.w = transform.rotation.w;
+    });
+    
   }
   
   this.subscribe = function( topic ) {

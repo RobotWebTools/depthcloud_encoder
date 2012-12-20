@@ -37,6 +37,7 @@ function (THREE) {
 
         this.video.loop = true;
         this.video.src = this.url;
+        this.video.crossOrigin = 'use-credentials';
 
         // ///////////////////////////
         // load shaders
@@ -132,14 +133,11 @@ function (THREE) {
             this.sceneNode.add(this.mesh);
 
             var that = this;
-            setInterval(
-
-            function () {
-
+            
+            setInterval( function () {
                 if (that.video.readyState === that.video.HAVE_ENOUGH_DATA) {
                     that.texture.needsUpdate = true;
                 }
-
             }, 1000 / 30);
         }
 
