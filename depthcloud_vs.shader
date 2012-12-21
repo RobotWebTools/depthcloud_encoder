@@ -112,12 +112,12 @@
       
       if (true)//depth>0.02)
       {
-        float z = depth;
+        float z = -depth;
         
         pos = vec4(
-          ( position.x / width - 0.5 ) * z * (1000.0/focallength),
+          ( position.x / width - 0.5 ) * z * (1000.0/focallength) * -1.0,
           ( position.y / height - 0.5 ) * z * (1000.0/focallength),
-          - z + zOffset / 1000.0,
+          (- z + zOffset / 1000.0) * 2.0,
           1.0);
         
         

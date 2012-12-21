@@ -110,7 +110,7 @@ function (THREE) {
                     },
                     "zOffset": {
                         type: "f",
-                        value: 1000
+                        value: 0
                     },
                     "colorFader": {
                         type: "f",

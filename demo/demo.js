@@ -71,9 +71,12 @@ InteractiveMarkerDisplay=new (function(THREE) {
     highlighter = new ThreeInteraction.Highlighter(mouseHandler);
 
     // connect to rosbridge
-    var ros = new ROS('ws://localhost:9099');
+    var rosUrl = "ws://"+window.location.hostname+':9099';
+    console.log("Connecting to ROS at ", rosUrl );
+    var ros = new ROS(rosUrl);
     
-    var meshBaseUrl = 'http://localhost:8000/resources/';
+    var meshBaseUrl = "http://"+window.location.hostname+':8000/resources/';
+    console.log("Getting meshes from ", meshBaseUrl );
 
     // show interactive markers
     imClient = new ImProxy.Client(ros);
@@ -83,10 +86,9 @@ InteractiveMarkerDisplay=new (function(THREE) {
     scene.add(depthNode);
 
     cloudStream = new DepthCloud.Viewer({
-      url : 'streams/depth_color_combined.webm?',
+      url : '../../streams/depth_color_combined.webm?',
       shaderUrl: '../',
-      sceneNode : depthNode,
-      f : 505.0
+      sceneNode : depthNode
     });
     
     cloudStream.startStream();
@@ -147,3 +149,4 @@ InteractiveMarkerDisplay=new (function(THREE) {
   }
 
 })(THREE);
+
