@@ -1,6 +1,14 @@
 /**
  * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
  */
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['three'], factory);
+  }
+  else {
+    factory(root.THREE);
+  }
+}(this, function (THREE) {
 
 THREE.ColladaLoader = function () {
 
@@ -4493,3 +4501,4 @@ THREE.ColladaLoader = function () {
 	};
 
 };
+}));

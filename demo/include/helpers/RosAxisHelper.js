@@ -10,14 +10,21 @@
   }
 }(this, function (THREE) {
 
-  THREE.Axes = function () 
+  THREE.Axes = function ( options ) 
   {
     THREE.Object3D.call( this );
     
     var that = this;
+    
+    options = options || {};
+    var shaftRadius = options.shaftRadius !== undefined ? options.shaftRadius : 0.008;
+    var headRadius = options.headRadius !== undefined ? options.headRadius : 0.023;
+    var headLength = options.headLength !== undefined ? options.headLength : 0.1;
+    
+    var longAxes = options.longAxes;
 
-    this.line_geom = new THREE.CylinderGeometry( 0.008, 0.008, 0.9 );
-    this.head_geom = new THREE.CylinderGeometry( 0, 0.023, 0.1 );
+    this.line_geom = new THREE.CylinderGeometry( shaftRadius, shaftRadius, 1.0 - headLength );
+    this.head_geom = new THREE.CylinderGeometry( 0, headRadius, headLength );
 
     function addAxis( axis )
     {

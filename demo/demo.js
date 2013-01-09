@@ -1,7 +1,7 @@
 InteractiveMarkerDisplay=new (function(THREE) {
 
   var camera, cameraControls, scene, renderer;
-  
+
   var selectableObjs;
 
   var directionalLight;
@@ -71,26 +71,60 @@ InteractiveMarkerDisplay=new (function(THREE) {
     highlighter = new ThreeInteraction.Highlighter(mouseHandler);
 
     // connect to rosbridge
-    var ros = new ROS('ws://localhost:9090');
-    
-    var meshBaseUrl = 'http://localhost:8000/resources/';
+    var rosUrl = "ws://"+window.location.hostname+':9099';
+    console.log("Connecting to ROS at ", rosUrl );
+    var ros = new ROS(rosUrl);
+
+    var meshBaseUrl = "http://"+window.location.hostname+':8000/resources/';
+    console.log("Getting meshes from ", meshBaseUrl );
 
     // show interactive markers
     imClient = new ImProxy.Client(ros);
     imViewer = new ImThree.Viewer(selectableObjs, camera, imClient, meshBaseUrl);
-    
+
     var depthNode = new THREE.Object3D;
     scene.add(depthNode);
 
     cloudStream = new DepthCloud.Viewer({
-      url : 'http://localhost:8888/streams/depth_color_combined.webm?',
+      url : "http://"+window.location.hostname+':8888/streams/webGL_pointcloud_image_encoder/depth_color_combined.webm?',
       sceneNode : depthNode,
-      f : 505.0
+      f : 505.0,
+      shaderUrl: '../'
     });
-    
+
     cloudStream.startStream();
+
+    var tfClient = new TfClient( {
+      ros: ros,
+      fixedFrame: 'base_link',
+      angularThres: 2.0,
+      transThres: 0.01
+    } );
+
+    tfClient.subscribe('head_mount_kinect_rgb_optical_frame',function(transform){
+      //console.log(transform);
+
+      depthNode.position.x = transform.translation.x;
+      depthNode.position.y = transform.translation.y;
+      depthNode.position.z = transform.translation.z;
+      depthNode.useQuaternion = true;
+      depthNode.quaternion.x = transform.rotation.x;
+      depthNode.quaternion.y = transform.rotation.y;
+      depthNode.quaternion.z = transform.rotation.z;
+      depthNode.quaternion.w = transform.rotation.w;
+
+      axes.position.x = transform.translation.x;
+      axes.position.y = transform.translation.y;
+      axes.position.z = transform.translation.z;
+      axes.useQuaternion = true;
+      axes.quaternion.x = transform.rotation.x;
+      axes.quaternion.y = transform.rotation.y;
+      axes.quaternion.z = transform.rotation.z;
+      axes.quaternion.w = transform.rotation.w;
+    });
+
   }
-  
+
   this.subscribe = function( topic ) {
     imClient.subscribe(topic);
   }
@@ -116,3 +150,4 @@ InteractiveMarkerDisplay=new (function(THREE) {
   }
 
 })(THREE);
+

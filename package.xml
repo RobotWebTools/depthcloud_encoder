@@ -1,0 +1,14 @@
+<package>
+  <name>depthcloudjs</name>
+  <description>
+     Decodes a specially encoded RGBD stream and renders it as a
+     pointcloud in WebGL.
+  </description>
+  <version>0.0.1</version>
+  <author>Julius Kammerl</author>
+  <maintainer email="jkammerl@willowgarage.com">Julius Kammerl</maintainer>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/http_video_streamer</url>
+</package>
+

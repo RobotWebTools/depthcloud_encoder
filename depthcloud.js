@@ -20,6 +20,7 @@ function (THREE) {
         // ///////////////////////////
 
         this.url = options.url;
+        this.shaderUrl = options.shaderUrl || 'js/';
         this.sceneNode = options.sceneNode;
         // f defaults to standard Kinect calibration
         this.f = (options.f !== undefined) ? options.f : 526;
@@ -45,7 +46,7 @@ function (THREE) {
 
         var vertex_shader, fragment_shader
         var shaderVXhr = new XMLHttpRequest();
-        shaderVXhr.open("GET", "include/shaders/depthcloud_vs.shader", true);
+        shaderVXhr.open("GET", this.shaderUrl+"depthcloud_vs.shader", true);
 
         shaderVXhr.onload = function () {
             that.vertex_shader = shaderVXhr.responseText;
@@ -54,7 +55,7 @@ function (THREE) {
         shaderVXhr.send(null);
 
         var shaderFXhr = new XMLHttpRequest();
-        shaderFXhr.open("GET", "include/shaders/depthcloud_fs.shader", true);
+        shaderFXhr.open("GET", this.shaderUrl+"depthcloud_fs.shader", true);
         shaderFXhr.onload = function () {
             that.fragment_shader = shaderFXhr.responseText;
             that.initStreamer();
@@ -108,7 +109,7 @@ function (THREE) {
                     },
                     "zOffset": {
                         type: "f",
-                        value: 1000
+                        value: 0
                     },
                     "colorFader": {
                         type: "f",
@@ -131,14 +132,11 @@ function (THREE) {
             this.sceneNode.add(this.mesh);
 
             var that = this;
-            setInterval(
 
-            function () {
-
+            setInterval( function () {
                 if (that.video.readyState === that.video.HAVE_ENOUGH_DATA) {
                     that.texture.needsUpdate = true;
                 }
-
             }, 1000 / 30);
         }
 
