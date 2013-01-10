@@ -25,7 +25,7 @@ InteractiveMarkerDisplay=new (function(THREE) {
     scene = new THREE.Scene();
 
     // setup camera mouse control
-    cameraControls = new THREE.RosOrbitControls(camera);
+    cameraControls = new THREE.RosOrbitControls(scene,camera);
 
     // add node to host selectable objects
     selectableObjs = new THREE.Object3D;
@@ -78,18 +78,14 @@ InteractiveMarkerDisplay=new (function(THREE) {
     var meshBaseUrl = "http://"+window.location.hostname+':8000/resources/';
     console.log("Getting meshes from ", meshBaseUrl );
 
-    // show interactive markers
-    imClient = new ImProxy.Client(ros);
-    imViewer = new ImThree.Viewer(selectableObjs, camera, imClient, meshBaseUrl);
-
     var depthNode = new THREE.Object3D;
     scene.add(depthNode);
 
     cloudStream = new DepthCloud.Viewer({
-      url : "http://"+window.location.hostname+':8888/streams/webGL_pointcloud_image_encoder/depth_color_combined.webm?',
+      url : '../streams/webGL_pointcloud_image_encoder/depth_color_combined.webm?',
       sceneNode : depthNode,
-      f : 505.0,
-      shaderUrl: '../'
+      f : 525.0,
+      shaderUrl: '../shaders/'
     });
 
     cloudStream.startStream();
@@ -103,7 +99,6 @@ InteractiveMarkerDisplay=new (function(THREE) {
 
     tfClient.subscribe('head_mount_kinect_rgb_optical_frame',function(transform){
       //console.log(transform);
-
       depthNode.position.x = transform.translation.x;
       depthNode.position.y = transform.translation.y;
       depthNode.position.z = transform.translation.z;
@@ -123,6 +118,9 @@ InteractiveMarkerDisplay=new (function(THREE) {
       axes.quaternion.w = transform.rotation.w;
     });
 
+    // show interactive markers
+    imClient = new ImProxy.Client(ros,tfClient);
+    imViewer = new ImThree.Viewer(selectableObjs, camera, imClient, meshBaseUrl);
   }
 
   this.subscribe = function( topic ) {
