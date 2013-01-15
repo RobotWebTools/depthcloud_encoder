@@ -9,5 +9,6 @@
   <maintainer email="jkammerl@willowgarage.com">Julius Kammerl</maintainer>
   <license>BSD</license>
   <url>http://ros.org/wiki/http_video_streamer</url>
+  <buildtool_depend>catkin</buildtool_depend>
 </package>
 
