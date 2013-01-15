@@ -8,8 +8,7 @@
   <author>Julius Kammerl</author>
   <maintainer email="jkammerl@willowgarage.com">Julius Kammerl</maintainer>
   <license>BSD</license>
-  <url>http://ros.org/wiki/depthcloudjs</url>
-  
+  <url>https://github.com/willowgarage/depthcloudjs</url>
   <buildtool_depend>catkin</buildtool_depend>
 </package>
 
