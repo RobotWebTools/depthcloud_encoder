@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(pointcloud_image_streamer)
+project(depthcloudjs)
 
 find_package(catkin REQUIRED)
 catkin_package()
