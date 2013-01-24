@@ -1,14 +1,25 @@
 <package>
-  <name>depthcloudjs</name>
+  <name>pointcloud_image_streamer</name>
   <description>
-     Decodes a specially encoded RGBD stream and renders it as a
-     pointcloud in WebGL.
+     Image streaming node that generates the source image data used to
+     render pointcloud in WebGL
   </description>
   <version>0.0.1</version>
   <author>Julius Kammerl</author>
   <maintainer email="jkammerl@willowgarage.com">Julius Kammerl</maintainer>
   <license>BSD</license>
-  <url>https://github.com/willowgarage/depthcloudjs</url>
+  <url>http://ros.org/wiki/http_video_streamer</url>
+  
   <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>message_filters</build_depend>
+  <build_depend>tf</build_depend>
+  
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>image_transport</run_depend>
+  <run_depend>message_filters</run_depend>
+  <run_depend>tf</run_depend>
 </package>
 
