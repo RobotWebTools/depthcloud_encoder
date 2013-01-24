@@ -82,7 +82,9 @@ InteractiveMarkerDisplay=new (function(THREE) {
     scene.add(depthNode);
 
     cloudStream = new DepthCloud.Viewer({
-      url : '../streams/depth_color_combined.webm?',
+      url : '../streams/depth_color_combined.webm?width=256&height=256',
+      width : 256,
+      height : 256,
       sceneNode : depthNode,
       f : 525.0,
       shaderUrl: '../shaders/'

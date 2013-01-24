@@ -66,18 +66,24 @@ public:
     pub_it_(nh_),
     crop_size_(512)
   {
+    // ROS parameters
+    ros::NodeHandle priv_nh_("~");
+      
     // read depth map topic from param server
     std::string depthmap_topic;
-    nh_.param<std::string>("depth", depthmap_topic, "/camera/depth/image");
+    priv_nh_.param<std::string>("depth", depthmap_topic, "/camera/depth/image");
 
     // read rgb topic from param server
     std::string rgb_image_topic;
-    nh_.param<std::string>("rgb", rgb_image_topic, "/camera/rgb/image_color");
+    priv_nh_.param<std::string>("rgb", rgb_image_topic, "/camera/rgb/image_color");
 
-    nh_.param<std::string>("frame", base_frame_, "/camera_link");
+    priv_nh_.param<std::string>("frame", base_frame_, "/camera_link");
 
     subscribe(depthmap_topic, rgb_image_topic);
 
+    ROS_INFO_STREAM("Subscribing to "<< rgb_image_topic);
+    ROS_INFO_STREAM("Subscribing to "<< depthmap_topic);
+     
     pub_ = pub_it_.advertise("depth_color_combined", 1);
   }
   virtual ~DepthRGBEncoder()
@@ -119,7 +125,7 @@ public:
 
   void depth_with_color_cb(const sensor_msgs::ImageConstPtr& depth_msg, const sensor_msgs::ImageConstPtr& color_msg)
   {
-    ROS_INFO("Image depth/color pair received");
+    ROS_DEBUG("Image depth/color pair received");
     process(depth_msg, color_msg, crop_size_);
   }
 
