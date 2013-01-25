@@ -77,8 +77,6 @@ public:
     std::string rgb_image_topic;
     priv_nh_.param<std::string>("rgb", rgb_image_topic, "/camera/rgb/image_color");
 
-    priv_nh_.param<std::string>("frame", base_frame_, "/camera_link");
-
     subscribe(depthmap_topic, rgb_image_topic);
 
     ROS_INFO_STREAM("Subscribing to "<< rgb_image_topic);
@@ -337,49 +335,7 @@ public:
       }
     }
 
-    encodeTFData(output_msg);
-
     pub_.publish(output_msg);
-
-  }
-
-  // encapsulate depth, point mask & color information in a single frame
-  void encodeTFData(sensor_msgs::ImagePtr output_msg)
-  {
-    static uint32_t frame_counter = 0;
-    const std::size_t bit_pix_size = 5;
-
-    tf::StampedTransform transform;
-    try{
-      tf_listener_.lookupTransform(base_frame_, output_msg->header.frame_id,
-                               ros::Time(0), transform);
-    }
-    catch (tf::TransformException ex){
-      ROS_ERROR("%s",ex.what());
-    }
-
-    float origin_x = transform.getOrigin().x();
-    float origin_y = transform.getOrigin().y();
-    float origin_z = transform.getOrigin().z();
-
-    uint32_t origin_x_int32 = *reinterpret_cast<uint32_t*>(&origin_x);
-    uint32_t origin_y_int32 = *reinterpret_cast<uint32_t*>(&origin_y);
-    uint32_t origin_z_int32 = *reinterpret_cast<uint32_t*>(&origin_z);
-
-    std::size_t off_x, off_y;
-    off_x = off_y = 0;
-
-    write_binary_int(frame_counter++, output_msg, off_x, off_y, bit_pix_size);
-    off_x += bit_pix_size*8*sizeof(uint32_t);
-
-    write_binary_int(origin_x_int32, output_msg, off_x, off_y, bit_pix_size);
-    off_x += bit_pix_size*8*sizeof(uint32_t);
-
-    write_binary_int(origin_y_int32, output_msg, off_x, off_y, bit_pix_size);
-    off_x += bit_pix_size*8*sizeof(uint32_t);
-
-    write_binary_int(origin_z_int32, output_msg, off_x, off_y, bit_pix_size);
-    off_x += bit_pix_size*8*sizeof(uint32_t);
 
   }
 
@@ -551,8 +507,6 @@ protected:
   image_transport::Publisher pub_;
 
   tf::TransformListener tf_listener_;
-
-  std::string base_frame_;
 
   std::size_t crop_size_;
 
