@@ -9,6 +9,6 @@ install(DIRECTORY html/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(FILE simple_webserver.py
+install(FILES simple_webserver.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
