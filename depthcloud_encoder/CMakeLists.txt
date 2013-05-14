@@ -19,7 +19,7 @@ include_directories(include
 link_directories( ${catkin_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 
 add_library(${PROJECT_NAME}_lib
-   src/depthcloud_node.cpp
+   src/depthcloud_encoder.cpp
 )
 target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
