@@ -38,6 +38,7 @@ function (THREE) {
         this.video.loop = true;
         this.video.src = this.url;
         this.video.crossOrigin = "Anonymous";
+        this.video.setAttribute("crossorigin", "Anonymous"); 
         // ///////////////////////////
         // load shaders
         // ///////////////////////////
