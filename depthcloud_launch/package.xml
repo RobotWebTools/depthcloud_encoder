@@ -1,8 +1,8 @@
 <package>
-    <name>depthcloudjs</name>
+    <name>depthcloud_launch</name>
     <version>0.0.1</version>
     <description>
-       Depthcloudjs meta package
+        Server tools to 
     </description>
     <maintainer email="jkammerl@willowgarage.com">Julius Kammerl</maintainer>
     <author email="jkammerl@willowgarage.com">Julius Kammerl</author>
@@ -13,9 +13,5 @@
 
     <run_depend>depthcloud_encoder</run_depend>
     <run_depend>depthcloud_www</run_depend>
-    <run_depend>depthcloud_launch</run_depend>
-    
-    <export>
-        <metapackage/>
-    </export>
+    <run_depend>ros_web_video</run_depend>
 </package>
