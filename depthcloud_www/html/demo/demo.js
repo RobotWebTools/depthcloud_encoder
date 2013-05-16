@@ -81,11 +81,14 @@ InteractiveMarkerDisplay=new (function(THREE) {
     var depthNode = new THREE.Object3D;
     scene.add(depthNode);
 
+    
+    var video_stream_url = "http://"+window.location.hostname+':9999/streams/depthcloud_encoded.webm';
+    	
     cloudStream = new DepthCloud.Viewer({
-      url : '../streams/depth_color_combined.webm?',
+      url : video_stream_url,
       sceneNode : depthNode,
       f : 525.0,
-      shaderUrl: '../shaders/'
+      shaderUrl: '../depthcloudjs/shaders/'
     });
 
     cloudStream.startStream();

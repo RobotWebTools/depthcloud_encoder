@@ -8,7 +8,3 @@ catkin_package()
 install(DIRECTORY html/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
-install(FILES simple_webserver.py
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
