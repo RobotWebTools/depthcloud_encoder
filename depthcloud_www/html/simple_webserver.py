@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from os import path
@@ -74,9 +74,9 @@ class MyHandler(BaseHTTPRequestHandler):
                 #self.send_header('Content-Type', "text/html")
                 self.send_header('Content-Length', path.getsize(filePath))
                 self.send_header('Access-Control-Allow-Origin', '*')
-                self.send_header('Content-Security-Policy', 'img-src \'http://localhost:8888\'; connect-src \'http://localhost:8888\'; video-src \'http://localhost:8888\'; frame-src \'self\'')
+#                self.send_header('Content-Security-Policy', 'img-src \'http://localhost:8888\'; connect-src \'http://localhost:8888\'; video-src \'http://localhost:8888\'; frame-src \'self\'')
                 self.send_header('Access-Control-Allow-Methods', '*')
-                self.send_header('Access-Control-Allow-Headers', 'video/webm')
+#                self.send_header('Access-Control-Allow-Headers', 'video/webm')
                 
                 self.end_headers()
                 self.wfile.write(f.read())
