@@ -81,6 +81,15 @@ InteractiveMarkerDisplay=new (function(THREE) {
     var depthNode = new THREE.Object3D;
     scene.add(depthNode);
 
+    // inital position
+    depthNode.position.x = 0.0;
+    depthNode.position.y = 0.0;
+    depthNode.position.z = 0.0;
+    depthNode.useQuaternion = true;
+    depthNode.quaternion.x = Math.sqrt(1/2);
+    depthNode.quaternion.y = 0.0;
+    depthNode.quaternion.z = 0.0;
+    depthNode.quaternion.w = -1*Math.sqrt(1/2);
     
     var video_stream_url = "http://"+window.location.hostname+':9999/streams/depthcloud_encoded.webm';
     	
