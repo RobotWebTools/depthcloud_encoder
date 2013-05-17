@@ -3,7 +3,7 @@
   <description>
      HTML files to render pointclouds within the web browser
   </description>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <author>Julius Kammerl</author>
   <maintainer email="jkammerl@willowgarage.com">Julius Kammerl</maintainer>
   <license>BSD</license>
