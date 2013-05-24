@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 project(depthcloud_encoder)
 
-find_package(catkin REQUIRED cv_bridge sensor_msgs image_transport message_filters roscpp)
+find_package(catkin REQUIRED cv_bridge sensor_msgs image_transport message_filters nodelet roscpp)
 
 find_package(Boost REQUIRED COMPONENTS system thread)
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}_lib
-  CATKIN_DEPENDS cv_bridge sensor_msgs image_transport message_filters roscpp
+  CATKIN_DEPENDS cv_bridge sensor_msgs image_transport message_filters nodelet roscpp
 )
 
 include_directories(include 
