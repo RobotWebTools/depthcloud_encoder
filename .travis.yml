@@ -15,7 +15,7 @@ install:
   - sudo rosdep init
   - rosdep update 
   - mkdir -p /tmp/ws/src
-  - ln -s `pwd` /tmp/ws/src/depthcloudjs
+  - ln -s `pwd` /tmp/ws/src/depthcloud_encoder
   - cd /tmp/ws
   - rosdep install --from-paths src --ignore-src --rosdistro groovy -y
 
