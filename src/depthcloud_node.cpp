@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *  Copyright (c) 2013, Willow Garage, Inc.
+ *  Copyright (c) 2014, Willow Garage, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -35,29 +35,18 @@
  */
 
 #include "depthcloud_encoder/depthcloud_encoder.h"
-#include <nodelet/nodelet.h>
 
+int main(int argc, char **argv){
+  ros::init(argc, argv, "head_controller_node");
+  ros::NodeHandle nh;
+  ros::NodeHandle pnh("~");
 
-namespace depthcloud
-{
+  depthcloud::DepthCloudEncoder depth_enc(nh, pnh);
 
-class DepthCloudEncoderNodelet : public nodelet::Nodelet
-{
-public:
-  DepthCloudEncoderNodelet() {};
+  ros::AsyncSpinner spinner(8);
 
-  ~DepthCloudEncoderNodelet() {}
+  spinner.start();
+  ros::waitForShutdown();
 
-private:
-  virtual void onInit()
-  {
-    lp.reset(new depthcloud::DepthCloudEncoder(getNodeHandle(), getPrivateNodeHandle()));
-  };
-
-  boost::shared_ptr<depthcloud::DepthCloudEncoder> lp;
-};
-
+  return 0;
 }
-
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(depthcloud::DepthCloudEncoderNodelet, nodelet::Nodelet);

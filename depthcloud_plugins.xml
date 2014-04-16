@@ -1,9 +1,0 @@
-<library path="lib/libdepthcloud_encoder_nodelet">
-
-  <class name="depthcloud/DepthCloudEncoderNodelet" type="depthcloud::DepthCloudEncoderNodelet" base_class_type="nodelet::Nodelet">
-    <description>
-      Depth cloud encoder
-    </description>
-  </class>
-
-</library>
