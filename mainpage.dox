@@ -1,0 +1,6 @@
+/**
+\mainpage
+
+\b Point Cloud Encoder for Web-Based Streaming
+This package republishes encoded point clouds for use in ros_web_video.
+*/

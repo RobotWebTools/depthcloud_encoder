@@ -1,14 +1,16 @@
 <package>
   <name>depthcloud_encoder</name>
-  <description>
-     Image streaming node that generates the source image data used to
-     render pointcloud in WebGL
-  </description>
   <version>0.0.3</version>
-  <author>Julius Kammerl</author>
-  <maintainer email="jkammerl@willowgarage.com">Julius Kammerl</maintainer>
+  <description>Point Cloud Encoder for Web-Based Streaming</description>
+
+  <maintainer email="rctoris@wpi.edu">Russell Toris</maintainer>
+  <author email="jkammerl@willowgarage.com">Julius Kammer</author>
+
   <license>BSD</license>
-  <url>http://ros.org/wiki/depthcloudjs</url>
+
+  <url type="website">http://ros.org/wiki/depthcloud_encoder</url>
+  <url type="bugtracker">https://github.com/RobotWebTools/depthcloud_encoder/issues</url>
+  <url type="repository">https://github.com/RobotWebTools/depthcloud_encoder</url>
   
   <buildtool_depend>catkin</buildtool_depend>
   
@@ -26,4 +28,3 @@
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
 </package>
-
