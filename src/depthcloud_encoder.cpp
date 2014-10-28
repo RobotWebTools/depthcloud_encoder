@@ -231,8 +231,8 @@ void DepthCloudEncoder::process(const sensor_msgs::ImageConstPtr& depth_msg,
     std::size_t y, x, left_x, top_y, width_x, width_y;
 
     // calculate borders to crop input image to crop_size X crop_size
-    int top_bottom_corner = (input_height - crop_size) / 2;
-    int left_right_corner = (input_width - crop_size) / 2;
+    int top_bottom_corner = (static_cast<int>(input_height) - static_cast<int>(crop_size)) / 2;
+    int left_right_corner = (static_cast<int>(input_width) - static_cast<int>(crop_size)) / 2;
 
     if (top_bottom_corner < 0)
     {
