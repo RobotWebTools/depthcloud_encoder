@@ -55,7 +55,7 @@ using namespace message_filters::sync_policies;
 namespace enc = sensor_msgs::image_encodings;
 
 static int target_resolution_ = 512;
-static int max_depth_per_tile = 2.0;
+static float max_depth_per_tile = 1.0;
 
 DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) :
     nh_(nh),
@@ -290,7 +290,6 @@ void DepthCloudEncoder::cloudToDepth(const sensor_msgs::PointCloud2& cloud_msg, 
   int number_of_points =  scene_cloud->size();
 
   using namespace std;
-  cout << "received cloud of size " << number_of_points <<endl;
 
   for(int i = 0 ; i < number_of_points ; i++)
     {
@@ -451,13 +450,13 @@ void DepthCloudEncoder::process(const sensor_msgs::ImageConstPtr& depth_msg,
 
       for (x = left_x; x < width_x; ++x)
       {
-        uint16_t depth_pix_low;
-        uint16_t depth_pix_high;
+        int depth_pix_low;
+        int depth_pix_high;
 
         if (*depth_ptr == *depth_ptr) // valid point
         {
-          depth_pix_low = std::min(std::max(0.0f, (*depth_ptr / 2.0f) * (float)(0xFF * 3)), (float)(0xFF * 3));
-          depth_pix_high = std::min(std::max(0.0f, ((*depth_ptr - max_depth_per_tile) / 2.0f) * (float)(0xFF) * 3), (float)(0xFF * 3));
+          depth_pix_low = std::min(std::max(0.0f, (*depth_ptr / max_depth_per_tile) * (float)(0xFF * 3)), (float)(0xFF * 3));
+          depth_pix_high = std::min(std::max(0.0f, ((*depth_ptr - max_depth_per_tile) / max_depth_per_tile) * (float)(0xFF) * 3), (float)(0xFF * 3));
         }
         else
         {
@@ -478,25 +477,18 @@ void DepthCloudEncoder::process(const sensor_msgs::ImageConstPtr& depth_msg,
           memset(mask_pix_ptr, 0xFF, pix_size);
         }
 
-        uint8_t depth_pix_low_r = depth_pix_low / 3;
-        uint8_t depth_pix_low_g = depth_pix_low / 3;
-        uint8_t depth_pix_low_b = depth_pix_low / 3;
-
-        if (depth_pix_low % 3 == 1)  ++depth_pix_low_r;
-        if (depth_pix_low % 3 == 2)  ++depth_pix_low_g;
+	// divide into color channels + saturate for each channel:
+        uint8_t depth_pix_low_r = std::min(std::max(0, depth_pix_low), (0xFF));
+        uint8_t depth_pix_low_g = std::min(std::max(0, depth_pix_low-(0xFF)), (0xFF));
+        uint8_t depth_pix_low_b = std::min(std::max(0, depth_pix_low-(0xFF*2)), (0xFF));
 
         *out_depth_low_ptr = depth_pix_low_r;  ++out_depth_low_ptr;
         *out_depth_low_ptr = depth_pix_low_g;  ++out_depth_low_ptr;
         *out_depth_low_ptr = depth_pix_low_b;  ++out_depth_low_ptr;
 
-        uint8_t depth_pix_high_r = depth_pix_high / 3;
-        uint8_t depth_pix_high_g = depth_pix_high / 3;
-        uint8_t depth_pix_high_b = depth_pix_high / 3;
-
-        if ((depth_pix_high % 3) == 1)
-          ++depth_pix_high_r;
-        if ((depth_pix_high % 3) == 2)
-          ++depth_pix_high_g;
+        uint8_t depth_pix_high_r = std::min(std::max(0, depth_pix_high), (0xFF));
+        uint8_t depth_pix_high_g = std::min(std::max(0, depth_pix_high-(0xFF)), (0xFF));
+        uint8_t depth_pix_high_b = std::min(std::max(0, depth_pix_high-(0xFF*2)), (0xFF));
 
         *out_depth_high_ptr = depth_pix_high_r; ++out_depth_high_ptr;
         *out_depth_high_ptr = depth_pix_high_g; ++out_depth_high_ptr;
