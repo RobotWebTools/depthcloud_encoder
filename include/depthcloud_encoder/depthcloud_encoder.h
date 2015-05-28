@@ -113,6 +113,7 @@ protected:
   std::string rgb_image_topic_;
   std::string cloud_topic_;
   std::string camera_frame_id_;
+  std::string depth_source_;
 
   tf::TransformListener tf_listener_;
 

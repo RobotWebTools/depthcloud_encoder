@@ -48,6 +48,8 @@
 
 #include <iostream>
 
+#include <ros/console.h>
+
 namespace depthcloud
 {
 
@@ -69,6 +71,9 @@ DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) 
 {
   // ROS parameters
   ros::NodeHandle priv_nh_("~");
+
+  // read source from param server
+  priv_nh_.param<std::string>("depth_source", depth_source_, "depthmap");
 
   // read point cloud topic from param server
   priv_nh_.param<std::string>("cloud", cloud_topic_, "");
@@ -102,10 +107,17 @@ void DepthCloudEncoder::connectCb()
 
   if (pub_.getNumSubscribers())
   {
-    if ( cloud_topic_.empty() )
+    if ( depth_source_ == "depthmap" && !depthmap_topic_.empty() )
       subscribe(depthmap_topic_, rgb_image_topic_);
-    else
+    else if ( depth_source_ == "cloud" && !cloud_topic_.empty() )
       subscribeCloud(cloud_topic_);
+    else {
+      if ( depth_source_ != "depthmap" && depth_source_ != "cloud" ) {
+	  ROS_ERROR("Invalid depth_source given to DepthCloudEncoder: use 'depthmap' or 'cloud'.");
+	  return;
+      }
+      ROS_ERROR_STREAM("Empty topic provided for DepthCloudEncoder depth_source " << depth_source_ << ". Check your arguments.");
+    }
   }
   else
   {
