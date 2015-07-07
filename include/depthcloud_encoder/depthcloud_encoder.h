@@ -50,6 +50,12 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 
+#include <tf/transform_listener.h>
+#include <geometry_msgs/TransformStamped.h>
+
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl/point_types.h>
+
 #include "ros/ros.h"
 
 namespace depthcloud
@@ -66,7 +72,10 @@ protected:
   void connectCb();
 
   void subscribe(std::string& depth_topic, std::string& color_topic);
+  void subscribeCloud(std::string& cloud_topic);
   void unsubscribe();
+
+  void cloudCB(const sensor_msgs::PointCloud2& cloud_msg);
 
   void depthCB(const sensor_msgs::ImageConstPtr& depth_msg);
 
@@ -76,6 +85,7 @@ protected:
                           sensor_msgs::ImagePtr depth_int_msg,
                           sensor_msgs::ImagePtr mask_msg);
 
+  void cloudToDepth(const sensor_msgs::PointCloud2& cloud_msg, sensor_msgs::ImagePtr depth_msg, sensor_msgs::ImagePtr color_msg);
   void process(const sensor_msgs::ImageConstPtr& depth_msg, const sensor_msgs::ImageConstPtr& color_msg, const std::size_t crop_size);
 
 
@@ -88,6 +98,7 @@ protected:
   // ROS stuff
   boost::shared_ptr<image_transport::SubscriberFilter > depth_sub_;
   boost::shared_ptr<image_transport::SubscriberFilter > color_sub_;
+  ros::Subscriber cloud_sub_;
 
   boost::shared_ptr<SynchronizerDepthColor> sync_depth_color_;
 
@@ -100,7 +111,15 @@ protected:
 
   std::string depthmap_topic_;
   std::string rgb_image_topic_;
+  std::string cloud_topic_;
+  std::string camera_frame_id_;
+  std::string depth_source_;
 
+  tf::TransformListener tf_listener_;
+
+  double f_;
+
+  bool connectivityExceptionFlag, lookupExceptionFlag;
 };
 
 }

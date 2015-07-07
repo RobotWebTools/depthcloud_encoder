@@ -43,7 +43,7 @@ int main(int argc, char **argv){
 
   depthcloud::DepthCloudEncoder depth_enc(nh, pnh);
 
-  ros::AsyncSpinner spinner(8);
+  ros::AsyncSpinner spinner(2);
 
   spinner.start();
   ros::waitForShutdown();

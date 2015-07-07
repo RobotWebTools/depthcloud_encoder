@@ -4,7 +4,7 @@ project(depthcloud_encoder)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED cv_bridge sensor_msgs image_transport message_filters roscpp)
+find_package(catkin REQUIRED cv_bridge sensor_msgs image_transport message_filters roscpp pcl_conversions pcl_ros tf_conversions)
 find_package(Boost REQUIRED COMPONENTS system thread)
 
 ###################################################
