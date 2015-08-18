@@ -1,6 +1,6 @@
 <package>
   <name>depthcloud_encoder</name>
-  <version>0.0.4</version>
+  <version>0.0.5</version>
   <description>Point Cloud Encoder for Web-Based Streaming</description>
 
   <maintainer email="rctoris@wpi.edu">Russell Toris</maintainer>
