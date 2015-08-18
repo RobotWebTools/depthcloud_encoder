@@ -2,6 +2,30 @@
 Changelog for package depthcloud_encoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.5 (2015-08-18)
+------------------
+* Merge pull request #5 from psoetens/develop-closecloud
+  Develop closecloud encoding
+* depthcloud: allow user to force use of depthmap or cloud source in case multiple options are available
+  Without this, we would always subscribe to the cloud topic, even if it
+  was not set in the launch file, but it was set in the rosparam server.
+  Signed-off-by: Peter Soetens <peter@intermodalics.eu>
+* package: add dependencies to pcl_conversions and tf_conversions.
+  Signed-off-by: Peter Soetens <peter@thesourceworks.com>
+* update package.xml to add pcl dependencies.
+  Signed-off-by: Peter Soetens <peter@thesourceworks.com>
+* Multiply resolution by 6 by taking closer images and more efficient use of color channels.
+  This patch also needs a change on the Depthcloud.js side.
+  We could encode these mapping settings on a separate topic
+  for Depthcloud.js to pickup again.
+  Signed-off-by: Peter Soetens <peter@thesourceworks.com>
+* encoder: support encoding of PCL point clouds
+  This does add a dependency to TF and PCL but makes the
+  encoder much more flexible in what it can encode.
+  Signed-off-by: Peter Soetens <peter@thesourceworks.com>
+* Changed to explicit casting
+* Contributors: Akin Sisbot, Peter Soetens, Russell Toris
+
 0.0.4 (2014-04-16)
 ------------------
 * source cleanup
