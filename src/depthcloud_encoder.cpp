@@ -57,7 +57,6 @@ using namespace message_filters::sync_policies;
 namespace enc = sensor_msgs::image_encodings;
 
 static int target_resolution_ = 512;
-static float max_depth_per_tile = 1.0;
 
 DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) :
     nh_(nh),
@@ -83,6 +82,9 @@ DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) 
 
   // read focal length value from param server in case a cloud topic is used.
   priv_nh_.param<double>("f", f_, 525.0);
+
+  // read max depth per tile from param server
+  priv_nh_.param<float>("max_depth_per_tile", max_depth_per_tile_, 1.0);
 
   // read depth map topic from param server
   priv_nh_.param<std::string>("depth", depthmap_topic_, "/camera/depth/image");
@@ -262,7 +264,7 @@ void DepthCloudEncoder::cloudToDepth(const sensor_msgs::PointCloud2& cloud_msg, 
       // ros::Time(0) can cause unexpected frames?
       tf_listener_.waitForTransform( this->camera_frame_id_, cloud_msg.header.frame_id,
 				    ros::Time(0), timeout);
-      tf_listener_.lookupTransform(this->camera_frame_id_, cloud_msg.header.frame_id, 
+      tf_listener_.lookupTransform(this->camera_frame_id_, cloud_msg.header.frame_id,
 				   ros::Time(0), transform);
     }
     catch (tf::ExtrapolationException& ex) {
@@ -467,8 +469,8 @@ void DepthCloudEncoder::process(const sensor_msgs::ImageConstPtr& depth_msg,
 
         if (*depth_ptr == *depth_ptr) // valid point
         {
-          depth_pix_low = std::min(std::max(0.0f, (*depth_ptr / max_depth_per_tile) * (float)(0xFF * 3)), (float)(0xFF * 3));
-          depth_pix_high = std::min(std::max(0.0f, ((*depth_ptr - max_depth_per_tile) / max_depth_per_tile) * (float)(0xFF) * 3), (float)(0xFF * 3));
+          depth_pix_low = std::min(std::max(0.0f, (*depth_ptr / max_depth_per_tile_) * (float)(0xFF * 3)), (float)(0xFF * 3));
+          depth_pix_high = std::min(std::max(0.0f, ((*depth_ptr - max_depth_per_tile_) / max_depth_per_tile_) * (float)(0xFF) * 3), (float)(0xFF * 3));
         }
         else
         {
@@ -489,7 +491,7 @@ void DepthCloudEncoder::process(const sensor_msgs::ImageConstPtr& depth_msg,
           memset(mask_pix_ptr, 0xFF, pix_size);
         }
 
-	// divide into color channels + saturate for each channel:
+        // divide into color channels + saturate for each channel:
         uint8_t depth_pix_low_r = std::min(std::max(0, depth_pix_low), (0xFF));
         uint8_t depth_pix_low_g = std::min(std::max(0, depth_pix_low-(0xFF)), (0xFF));
         uint8_t depth_pix_low_b = std::min(std::max(0, depth_pix_low-(0xFF*2)), (0xFF));

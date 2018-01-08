@@ -118,6 +118,7 @@ protected:
   tf::TransformListener tf_listener_;
 
   double f_;
+  float max_depth_per_tile_;
 
   bool connectivityExceptionFlag, lookupExceptionFlag;
 };
