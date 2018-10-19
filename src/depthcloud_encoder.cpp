@@ -77,11 +77,17 @@ DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) 
   // read point cloud topic from param server
   priv_nh_.param<std::string>("cloud", cloud_topic_, "");
 
+  // read camera info topic from param server.
+  priv_nh_.param<std::string>("camera_info_topic", camera_info_topic_, "");
+
   // The original frame id of the camera that captured this cloud
   priv_nh_.param<std::string>("camera_frame_id", camera_frame_id_, "/camera_rgb_optical_frame");
 
   // read focal length value from param server in case a cloud topic is used.
   priv_nh_.param<double>("f", f_, 525.0);
+
+  // read focal length multiplication factor value from param server in case a cloud topic is used.
+  priv_nh_.param<double>("f_mult_factor", f_mult_factor_, 1.0);
 
   // read max depth per tile from param server
   priv_nh_.param<float>("max_depth_per_tile", max_depth_per_tile_, 1.0);
@@ -115,8 +121,8 @@ void DepthCloudEncoder::connectCb()
       subscribeCloud(cloud_topic_);
     else {
       if ( depth_source_ != "depthmap" && depth_source_ != "cloud" ) {
-	  ROS_ERROR("Invalid depth_source given to DepthCloudEncoder: use 'depthmap' or 'cloud'.");
-	  return;
+        ROS_ERROR("Invalid depth_source given to DepthCloudEncoder: use 'depthmap' or 'cloud'.");
+        return;
       }
       ROS_ERROR_STREAM("Empty topic provided for DepthCloudEncoder depth_source " << depth_source_ << ". Check your arguments.");
     }
@@ -127,12 +133,20 @@ void DepthCloudEncoder::connectCb()
   }
 }
 
+void DepthCloudEncoder::cameraInfoCb(const sensor_msgs::CameraInfoConstPtr& cam_info_msg)
+{
+  if (cam_info_msg) {
+    // Update focal length value.
+    const double fx = f_mult_factor_ * cam_info_msg->K[0];
+    const double fy = f_mult_factor_ * cam_info_msg->K[4];
+    f_ = (fx + fy) / 2;
+  }
+}
+
 void DepthCloudEncoder::dynReconfCb(depthcloud_encoder::paramsConfig& config, uint32_t level)
 {
-  boost::lock_guard<boost::mutex> lock(config_params_mutex_);
-
   max_depth_per_tile_ = config.max_depth_per_tile;
-  f_ = config.f;
+  f_mult_factor_ = config.f_mult_factor;
 }
 
 void DepthCloudEncoder::subscribeCloud(std::string& cloud_topic)
@@ -143,6 +157,9 @@ void DepthCloudEncoder::subscribeCloud(std::string& cloud_topic)
 
   // subscribe to depth cloud topic
   cloud_sub_ = nh_.subscribe(cloud_topic, 1, &DepthCloudEncoder::cloudCB, this );
+  if (!camera_info_topic_.empty()) {
+    camera_info_sub_ = nh_.subscribe(camera_info_topic_, 2, &DepthCloudEncoder::cameraInfoCb, this);
+  }
 }
 
 void DepthCloudEncoder::subscribe(std::string& depth_topic, std::string& color_topic)
@@ -192,6 +209,7 @@ void DepthCloudEncoder::unsubscribe()
   {
     // reset all message filters
     cloud_sub_.shutdown();
+    camera_info_sub_.shutdown();
     sync_depth_color_.reset(new SynchronizerDepthColor(SyncPolicyDepthColor(10)));
     depth_sub_.reset(new image_transport::SubscriberFilter());
     color_sub_.reset(new image_transport::SubscriberFilter());
@@ -204,8 +222,6 @@ void DepthCloudEncoder::unsubscribe()
 
 void DepthCloudEncoder::cloudCB(const sensor_msgs::PointCloud2& cloud_msg)
 {
-  boost::lock_guard<boost::mutex> lock(config_params_mutex_);
-
   sensor_msgs::ImagePtr depth_msg( new sensor_msgs::Image() );
   sensor_msgs::ImagePtr color_msg( new sensor_msgs::Image() );
   /* For depth:
@@ -650,4 +666,3 @@ void DepthCloudEncoder::depthInterpolation(sensor_msgs::ImageConstPtr depth_msg,
 
 
 }
-

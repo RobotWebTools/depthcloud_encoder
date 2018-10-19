@@ -80,6 +80,8 @@ protected:
   void subscribeCloud(std::string& cloud_topic);
   void unsubscribe();
 
+  void cameraInfoCb(const sensor_msgs::CameraInfoConstPtr& cam_info_msg);
+
   void cloudCB(const sensor_msgs::PointCloud2& cloud_msg);
 
   void depthCB(const sensor_msgs::ImageConstPtr& depth_msg);
@@ -104,11 +106,11 @@ protected:
   boost::shared_ptr<image_transport::SubscriberFilter > depth_sub_;
   boost::shared_ptr<image_transport::SubscriberFilter > color_sub_;
   ros::Subscriber cloud_sub_;
+  ros::Subscriber camera_info_sub_;
 
   boost::shared_ptr<SynchronizerDepthColor> sync_depth_color_;
 
   boost::mutex connect_mutex_;
-  boost::mutex config_params_mutex_;
 
   image_transport::ImageTransport pub_it_;
   image_transport::Publisher pub_;
@@ -118,12 +120,14 @@ protected:
   std::string depthmap_topic_;
   std::string rgb_image_topic_;
   std::string cloud_topic_;
+  std::string camera_info_topic_;
   std::string camera_frame_id_;
   std::string depth_source_;
 
   tf::TransformListener tf_listener_;
 
   double f_;
+  double f_mult_factor_;
   float max_depth_per_tile_;
 
   bool connectivityExceptionFlag, lookupExceptionFlag;
@@ -132,4 +136,3 @@ protected:
 }
 
 #endif
-
