@@ -127,6 +127,14 @@ void DepthCloudEncoder::connectCb()
   }
 }
 
+void DepthCloudEncoder::dynReconfCb(depthcloud_encoder::paramsConfig& config, uint32_t level)
+{
+  boost::lock_guard<boost::mutex> lock(config_params_mutex_);
+
+  max_depth_per_tile_ = config.max_depth_per_tile;
+  f_ = config.f;
+}
+
 void DepthCloudEncoder::subscribeCloud(std::string& cloud_topic)
 {
   unsubscribe();
@@ -196,6 +204,8 @@ void DepthCloudEncoder::unsubscribe()
 
 void DepthCloudEncoder::cloudCB(const sensor_msgs::PointCloud2& cloud_msg)
 {
+  boost::lock_guard<boost::mutex> lock(config_params_mutex_);
+
   sensor_msgs::ImagePtr depth_msg( new sensor_msgs::Image() );
   sensor_msgs::ImagePtr color_msg( new sensor_msgs::Image() );
   /* For depth:
@@ -212,18 +222,21 @@ void DepthCloudEncoder::cloudCB(const sensor_msgs::PointCloud2& cloud_msg)
      is_bigendian: 0
      step: 1920
   */
-  color_msg->height = depth_msg->height = 480;
-  color_msg->width  = depth_msg->width  = 640;
+  color_msg->height = depth_msg->height = cloud_msg.height;
+  color_msg->width  = depth_msg->width  = cloud_msg.width;
   depth_msg->encoding = "32FC1";
   color_msg->encoding = "rgb8";
   color_msg->is_bigendian = depth_msg->is_bigendian = 0;
   depth_msg->step = depth_msg->width * 4;
   color_msg->step = color_msg->width * 3;
-  depth_msg->data.resize( depth_msg->height * depth_msg->step ); // 480 rows of 2560 bytes.
-  color_msg->data.resize( color_msg->height * color_msg->step, 0 ); // 480 rows of 1920 bytes.
-  for( int j=0; j < depth_msg->height; ++j ) {
-    for( int i =0; i < depth_msg->width; ++i ) {
-      *(float*)&depth_msg->data[ j*640*4 + i*4] = std::numeric_limits<float>::quiet_NaN();
+  // 480 (default) rows of 2560 bytes.
+  depth_msg->data.resize(depth_msg->height * depth_msg->step);
+  // 480 (default) rows of 1920 bytes.
+  color_msg->data.resize(color_msg->height * color_msg->step, 0);
+  for (int j=0; j < depth_msg->height; ++j) {
+    for (int i =0; i < depth_msg->width; ++i) {
+      *(float*)&depth_msg->data[ j * cloud_msg.width * 4 + i * 4 ] =
+          std::numeric_limits<float>::quiet_NaN();
     }
   }
 

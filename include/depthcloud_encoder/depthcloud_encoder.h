@@ -41,6 +41,9 @@
 #include <string>
 #include <boost/thread.hpp>
 
+#include <dynamic_reconfigure/server.h>
+#include <depthcloud_encoder/paramsConfig.h>
+
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
 
@@ -66,6 +69,8 @@ class DepthCloudEncoder
 public:
   DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh);
   virtual ~DepthCloudEncoder();
+
+  void dynReconfCb(depthcloud_encoder::paramsConfig& config, uint32_t level);
 
 protected:
 
@@ -103,6 +108,7 @@ protected:
   boost::shared_ptr<SynchronizerDepthColor> sync_depth_color_;
 
   boost::mutex connect_mutex_;
+  boost::mutex config_params_mutex_;
 
   image_transport::ImageTransport pub_it_;
   image_transport::Publisher pub_;

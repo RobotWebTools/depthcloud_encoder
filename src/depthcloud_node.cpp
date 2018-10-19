@@ -43,6 +43,9 @@ int main(int argc, char **argv){
 
   depthcloud::DepthCloudEncoder depth_enc(nh, pnh);
 
+  dynamic_reconfigure::Server<depthcloud_encoder::paramsConfig> server;
+  server.setCallback(boost::bind(&depthcloud::DepthCloudEncoder::dynReconfCb, &depth_enc, _1, _2));
+
   ros::AsyncSpinner spinner(2);
 
   spinner.start();
