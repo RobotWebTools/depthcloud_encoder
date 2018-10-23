@@ -4,12 +4,26 @@ project(depthcloud_encoder)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED cv_bridge sensor_msgs image_transport message_filters roscpp pcl_conversions pcl_ros tf_conversions)
+find_package(catkin REQUIRED
+  cv_bridge
+  dynamic_reconfigure
+  image_transport
+  message_filters
+  pcl_conversions
+  pcl_ros
+  roscpp
+  sensor_msgs
+  tf_conversions
+)
 find_package(Boost REQUIRED COMPONENTS system thread)
 
 ###################################################
 ## Declare things to be passed to other projects ##
 ###################################################
+
+generate_dynamic_reconfigure_options(
+  cfg/params.cfg
+)
 
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
@@ -25,11 +39,11 @@ catkin_package(
 ###########
 
 ## Specify additional locations of header files
-include_directories(include 
-  ${catkin_INCLUDE_DIRS} 
+include_directories(include
+  ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
 )
-                    
+
 link_directories(
   ${catkin_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}

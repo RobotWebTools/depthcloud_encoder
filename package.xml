@@ -1,4 +1,5 @@
-<package>
+<?xml version="1.0"?>
+<package format="2">
   <name>depthcloud_encoder</name>
   <version>0.0.5</version>
   <description>Point Cloud Encoder for Web-Based Streaming</description>
@@ -11,24 +12,17 @@
   <url type="website">http://ros.org/wiki/depthcloud_encoder</url>
   <url type="bugtracker">https://github.com/RobotWebTools/depthcloud_encoder/issues</url>
   <url type="repository">https://github.com/RobotWebTools/depthcloud_encoder</url>
-  
+
   <buildtool_depend>catkin</buildtool_depend>
-  
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>message_filters</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>pcl_ros</build_depend>
-  <build_depend>pcl_conversions</build_depend>
-  <build_depend>tf_conversions</build_depend>
-  
-  <run_depend>cv_bridge</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>message_filters</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>pcl_ros</run_depend>
-  <run_depend>pcl_conversions</run_depend>
-  <run_depend>tf_conversions</run_depend>
+
+  <depend>cv_bridge</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>image_transport</depend>
+  <depend>message_filters</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>pcl_ros</depend>
+  <depend>pcl_conversions</depend>
+  <depend>tf_conversions</depend>
+
 </package>

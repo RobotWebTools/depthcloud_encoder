@@ -41,6 +41,9 @@
 #include <string>
 #include <boost/thread.hpp>
 
+#include <dynamic_reconfigure/server.h>
+#include <depthcloud_encoder/paramsConfig.h>
+
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
 
@@ -67,6 +70,8 @@ public:
   DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh);
   virtual ~DepthCloudEncoder();
 
+  void dynReconfCb(depthcloud_encoder::paramsConfig& config, uint32_t level);
+
 protected:
 
   void connectCb();
@@ -74,6 +79,8 @@ protected:
   void subscribe(std::string& depth_topic, std::string& color_topic);
   void subscribeCloud(std::string& cloud_topic);
   void unsubscribe();
+
+  void cameraInfoCb(const sensor_msgs::CameraInfoConstPtr& cam_info_msg);
 
   void cloudCB(const sensor_msgs::PointCloud2& cloud_msg);
 
@@ -99,6 +106,7 @@ protected:
   boost::shared_ptr<image_transport::SubscriberFilter > depth_sub_;
   boost::shared_ptr<image_transport::SubscriberFilter > color_sub_;
   ros::Subscriber cloud_sub_;
+  ros::Subscriber camera_info_sub_;
 
   boost::shared_ptr<SynchronizerDepthColor> sync_depth_color_;
 
@@ -112,12 +120,14 @@ protected:
   std::string depthmap_topic_;
   std::string rgb_image_topic_;
   std::string cloud_topic_;
+  std::string camera_info_topic_;
   std::string camera_frame_id_;
   std::string depth_source_;
 
   tf::TransformListener tf_listener_;
 
   double f_;
+  double f_mult_factor_;
   float max_depth_per_tile_;
 
   bool connectivityExceptionFlag, lookupExceptionFlag;
@@ -126,4 +136,3 @@ protected:
 }
 
 #endif
-
