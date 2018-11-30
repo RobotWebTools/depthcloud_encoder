@@ -56,15 +56,12 @@ namespace depthcloud
 using namespace message_filters::sync_policies;
 namespace enc = sensor_msgs::image_encodings;
 
-static int target_resolution_ = 512;
-
 DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) :
     nh_(nh),
     pnh_(pnh),
     depth_sub_(),
     color_sub_(),
     pub_it_(nh_),
-    crop_size_(target_resolution_),
     connectivityExceptionFlag(false),
     lookupExceptionFlag(false)
 {
@@ -91,6 +88,9 @@ DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) 
 
   // read max depth per tile from param server
   priv_nh_.param<float>("max_depth_per_tile", max_depth_per_tile_, 1.0);
+
+  // read target resolution from param server.
+  priv_nh_.param<int>("target_resolution", crop_size_, 512);
 
   // read depth map topic from param server
   priv_nh_.param<std::string>("depth", depthmap_topic_, "/camera/depth/image");
@@ -238,6 +238,7 @@ void DepthCloudEncoder::cloudCB(const sensor_msgs::PointCloud2& cloud_msg)
      is_bigendian: 0
      step: 1920
   */
+
   color_msg->height = depth_msg->height = cloud_msg.height;
   color_msg->width  = depth_msg->width  = cloud_msg.width;
   depth_msg->encoding = "32FC1";
