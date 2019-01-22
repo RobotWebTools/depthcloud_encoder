@@ -129,6 +129,7 @@ protected:
   double f_;
   double f_mult_factor_;
   float max_depth_per_tile_;
+  bool latch_;
 
   bool connectivityExceptionFlag, lookupExceptionFlag;
 };
