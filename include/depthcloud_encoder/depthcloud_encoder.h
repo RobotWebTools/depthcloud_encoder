@@ -115,7 +115,7 @@ protected:
   image_transport::ImageTransport pub_it_;
   image_transport::Publisher pub_;
 
-  std::size_t crop_size_;
+  int crop_size_;
 
   std::string depthmap_topic_;
   std::string rgb_image_topic_;
