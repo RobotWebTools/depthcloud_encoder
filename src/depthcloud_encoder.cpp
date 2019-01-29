@@ -98,12 +98,15 @@ DepthCloudEncoder::DepthCloudEncoder(ros::NodeHandle& nh, ros::NodeHandle& pnh) 
   // read rgb topic from param server
   priv_nh_.param<std::string>("rgb", rgb_image_topic_, "/camera/rgb/image_color");
 
+  // Whether the encoded topic should be latched.
+  priv_nh_.param<bool>("latch", latch_, false);
+
   // Monitor whether anyone is subscribed to the output
   image_transport::SubscriberStatusCallback connect_cb = boost::bind(&DepthCloudEncoder::connectCb, this);
   // Make sure we don't enter connectCb() between advertising and assigning to pub_point_cloud_
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
 
-  pub_ = pub_it_.advertise("depthcloud_encoded", 1, connect_cb, connect_cb);
+  pub_ = pub_it_.advertise("depthcloud_encoded", 1, connect_cb, connect_cb, ros::VoidPtr(), latch_);
 }
 DepthCloudEncoder::~DepthCloudEncoder()
 {
