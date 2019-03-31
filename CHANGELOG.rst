@@ -2,8 +2,8 @@
 Changelog for package depthcloud_encoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2019-03-31)
+------------------
 * Add ability to latch encoded topic (`#12 <https://github.com/RobotWebTools/depthcloud_encoder/issues/12>`_)
 * Make target resolution / crop size a parameter (`#11 <https://github.com/RobotWebTools/depthcloud_encoder/issues/11>`_)
 * Add dynamic reconfigure server + fetch focal length from camera info topic (`#10 <https://github.com/RobotWebTools/depthcloud_encoder/issues/10>`_)
