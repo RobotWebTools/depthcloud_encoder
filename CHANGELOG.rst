@@ -2,6 +2,17 @@
 Changelog for package depthcloud_encoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add ability to latch encoded topic (`#12 <https://github.com/RobotWebTools/depthcloud_encoder/issues/12>`_)
+* Make target resolution / crop size a parameter (`#11 <https://github.com/RobotWebTools/depthcloud_encoder/issues/11>`_)
+* Add dynamic reconfigure server + fetch focal length from camera info topic (`#10 <https://github.com/RobotWebTools/depthcloud_encoder/issues/10>`_)
+  * Add dynamic reconfigure server for some params
+  * Fetch focal length from camera info topic
+* Parameterize max_depth_per_tile (`#8 <https://github.com/RobotWebTools/depthcloud_encoder/issues/8>`_)
+* Update travis config to build for indigo and kinetic (`#9 <https://github.com/RobotWebTools/depthcloud_encoder/issues/9>`_)
+* Contributors: Jihoon Lee, Viktor Kunovski
+
 0.0.5 (2015-08-18)
 ------------------
 * Merge pull request #5 from psoetens/develop-closecloud
