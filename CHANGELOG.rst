@@ -2,8 +2,8 @@
 Changelog for package depthcloud_encoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2019-05-05)
+------------------
 * Add dynamic reconfigure gen as dependency chain (`#14 <https://github.com/RobotWebTools/depthcloud_encoder/issues/14>`_)
 * Contributors: Jihoon Lee
 
