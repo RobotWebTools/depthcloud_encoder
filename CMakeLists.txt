@@ -57,6 +57,10 @@ target_link_libraries(${PROJECT_NAME}_lib
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
 )
+add_dependencies(${PROJECT_NAME}_lib
+   ${PROJECT_NAME}_gencfg
+   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+  )
 
 add_executable(${PROJECT_NAME}_node
    src/depthcloud_node.cpp
