@@ -1,8 +1,6 @@
 # This config file for Travis CI utilizes ros-industrial/industrial_ci package.
 # For more info for the package, see https://github.com/ros-industrial/industrial_ci/blob/master/README.rst
 
-dist: trusty
-sudo: required
 services:
   - docker
 language: generic
@@ -19,14 +17,14 @@ notifications:
 env:
   matrix:
     - ROS_DISTRO="kinetic"   ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu  USE_DEB=true
-    - ROS_DISTRO="indigo"    ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu  USE_DEB=true
+    - ROS_DISTRO="melodic"    ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu  USE_DEB=true
     - ROS_DISTRO="kinetic"   PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=0
-    - ROS_DISTRO="indigo"   PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=0
+    - ROS_DISTRO="melodic"   PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=0
 
 matrix:
   allow_failures:
     - env: ROS_DISTRO="kinetic"   PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=0
-    - env: ROS_DISTRO="indigo"   PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=0
+    - env: ROS_DISTRO="melodic"   PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=0
 
 branches:
   only:
