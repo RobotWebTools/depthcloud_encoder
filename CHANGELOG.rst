@@ -2,6 +2,11 @@
 Changelog for package depthcloud_encoder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add dynamic reconfigure gen as dependency chain (`#14 <https://github.com/RobotWebTools/depthcloud_encoder/issues/14>`_)
+* Contributors: Jihoon Lee
+
 0.1.0 (2019-03-31)
 ------------------
 * Add ability to latch encoded topic (`#12 <https://github.com/RobotWebTools/depthcloud_encoder/issues/12>`_)
