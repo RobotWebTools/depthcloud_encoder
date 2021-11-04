@@ -1,6 +1,8 @@
 depthcloud_encoder [![Build Status](https://api.travis-ci.org/RobotWebTools/depthcloud_encoder.png)](https://travis-ci.org/RobotWebTools/depthcloud_encoder)
 ==================
 
+**Status**: This project is not maintained (see [#17](https://github.com/RobotWebTools/depthcloud_encoder/issues/17))
+
 #### Point Cloud Encoder for Web-Based Streaming
 For full documentation, see [the ROS wiki](http://ros.org/wiki/depthcloud_encoder).
 
